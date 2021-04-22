@@ -1,0 +1,20 @@
+Error info:(pymysql.err.DataError) (1366, "Incorrect string value: '\\xF0\\x9D\\x99\\xB0\\xF0\\x9D...' for column 'user_name' at row 1")
+[SQL: INSERT INTO tweet_data (user_name, user_id, date, content, reply, retweet, `like`, following, followers, modify_tag) VALUES (%(user_name)s, %(user_id)s, %(date)s, %(content)s, %(reply)s, %(retweet)s, %(like)s, %(following)s, %(followers)s, %(modify_tag)s)]
+[parameters: {'user_name': '𝙰𝚟𝚊 ʕ ﹒︣ ᴥ ﹒︣ ʔ', 'user_id': '@avatarrant', 'date': '2021-04-13 22:56:05', 'content': 'taylor hall and brad marchand on the same team is WAY too much twitter power— except they have totally different energies', 'reply': 0, 'retweet': 2, 'like': 0, 'following': 0, 'followers': 0, 'modify_tag': 0}]
+(Background on this error at: http://sqlalche.me/e/14/9h9h)
+Error info:Message: no such window: target window already closed
+from unknown error: web view not found
+  (Session info: chrome=89.0.4389.128)
+
+Error info:Message: no such window: window was already closed
+  (Session info: chrome=89.0.4389.128)
+
+
+
+
+Error info:Message: no such window: window was already closed
+  (Session info: chrome=89.0.4389.128)
+
+Error info:Message: no such window: window was already closed
+  (Session info: chrome=89.0.4389.128)
+
