@@ -83,9 +83,9 @@ class TwitterScraper:
                     content = filter_emoji(content)         # filter emoji
                     user_id = passage.find(
                         'div', {'class': 'css-1dbjc4n r-18u37iz r-1wbh5a2 r-13hce6t'}).get_text()
-                    #date = passage.find('time')['datetime']
+                    date = passage.find('time')['datetime']
                     # change raw time format("2021-04-12 20:30:31") to exact format("2021-04-12 20:30:31")
-                    #date = date.replace('T',' ').replace('X','').replace('.000Z','')
+                    date = date.replace('T',' ').replace('X','').replace('.000Z','')
                     user_name = passage.find(
                         'div', {'class': 'css-1dbjc4n r-1awozwy r-18u37iz r-dnmrzs'}).get_text()
                     user_name = filter_emoji(user_name)
