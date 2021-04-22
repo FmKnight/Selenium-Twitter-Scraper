@@ -9,12 +9,14 @@ import re
 from utils.RedisDB import RedisDAL
 from utils.MysqlDB import Tweet, MysqlDAL
 from utils.content_filter import filter_emoji, count
+from utils.date_generator import time_span_generator
 
 class TwitterScraper:
     """[main program of Twitter Scraper]
     """
-    def __init__(self, url):
-        self.url = url
+    def __init__(self):
+        self.url_list = []
+        self.scraped_url_list = []
         self.browser = None
         self.MysqlDAL = MysqlDAL   # MysqlDB Access Layer
         self.RedisDAL = RedisDAL   # RedisDB Access Layer
@@ -28,8 +30,9 @@ class TwitterScraper:
         options = webdriver.ChromeOptions()
         options.add_argument('blink-settings=imagesEnabled=false')
         self.browser = webdriver.Chrome(options=options)
-        self.browser.get(self.url)
 
+    def get_url_list(self,*args):
+        self.url_list.extend(args)
 
     def scroll(self):
         """[simulate scroll down]
@@ -113,23 +116,30 @@ class TwitterScraper:
         """
         while True:
             try:
-                self.Chrome_activate()
-                self.scroll()
+                for base_url in self.url_list:
+                    for time_span in time_span_generator:
+                        start_date, end_date = time_span
+                        url = base_url.format(end_date, start_date)
+                        if url not in self.scraped_url_list:
+                            self.browser.get(url)
+                            self.scroll()
+                            self.scraped_url_list.append(url)
+                            time.sleep(5)
+                        else:
+                            continue
             except Exception as e:
                 #if there are exceptions, restart program
                 with open("./error_info.txt", "a") as f:
                     f.write(f"Error info:{e}"+"\n")
-                self.browser.close()
                 self.Chrome_activate()
-                self.scroll()
                 continue
 
 
 
-
 if __name__ == "__main__":
-    url1 = r"https://twitter.com/search?q=(Facebook%20OR%20Google%20OR%20Amazon%20OR%20Twitter%20OR%20%22Big%20Tech%22%20OR%20%22Giant%20Tech%22)%20AND%20(politics%20OR%20power%20OR%20election%20OR%20influence)%20until%3A2008-01-30%20since%3A2008-01-01&src=typed_query"
-    url2 = r"https://twitter.com/search?q=(Facebook%20OR%20Google%20OR%20Amazon%20OR%20Twitter%20OR%20%22Big%20Tech%22%20OR%20%22Giant%20Tech%22)%20AND%20(Pandemic%20OR%20COVID-19)%20until%3A2021-04-20%20since%3A2008-01-01&src=typed_query"
-    tweeter = TwitterScraper(url1)
+    base_url1 = r"https://twitter.com/search?q=(Facebook%20OR%20Google%20OR%20Amazon%20OR%20Twitter%20OR%20%22Big%20Tech%22%20OR%20%22Giant%20Tech%22)%20AND%20(politics%20OR%20power%20OR%20election%20OR%20influence)%20until%3A{}%20since%3A{}&src=typed_query"
+    base_url2 = r"https://twitter.com/search?q=(Facebook%20OR%20Google%20OR%20Amazon%20OR%20Twitter%20OR%20%22Big%20Tech%22%20OR%20%22Giant%20Tech%22)%20AND%20(Pandemic%20OR%20COVID-19)%20until%3A{}%20since%3A{}&src=typed_query"
+    tweeter = TwitterScraper()
+    tweeter.get_url_list(base_url1,base_url2)
     tweeter.launcher()
 

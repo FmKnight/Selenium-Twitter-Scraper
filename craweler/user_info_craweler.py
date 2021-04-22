@@ -38,36 +38,44 @@ class UserInfoCraweler:
             #print(following, followers)
             return following, followers
         else:
-            print("fail to get follow data")
+            print("fail to get follow data, may be this user not exists")
 
     def update(self):
         """[update follow data to MysqlDB]
         """
         users_data = self.MysqlDAL.query()
         for user_data in users_data:
-            if user_data.modify_tag == False:                             # check whether modified or not
-                user_id = user_data.user_id                               # get user_id from MysqlDB
-                user_id = user_id.replace("@","")
-                url = f"https://twitter.com/{user_id}"
-                self.browser.get(url)
-                time.sleep(3)
-                user_data.following, user_data.followers = self.parse()    # update value
-                user_data.modify_tag = True
-                self.MysqlDAL.session.commit()
-                print("save user's follow data to MysqlDB successfully")
-            else:
-                print("this user's follow data has been got")
+            try:
+                if user_data.modify_tag == False:                             # check whether modified or not
+                    user_id = user_data.user_id                               # get user_id from MysqlDB
+                    user_id = user_id.replace("@","")
+                    url = f"https://twitter.com/{user_id}"
+                    self.browser.get(url)
+                    time.sleep(3)
+                    user_data.following, user_data.followers = self.parse()    # update value
+                    user_data.modify_tag = True
+                    self.MysqlDAL.session.commit()
+                    print("save user's follow data to MysqlDB successfully")
+                    time.sleep(1)
+                else:
+                    print("this user's follow data has been got")
+                    continue
+            except:
                 continue
 
     def launcher(self):
         """[launch scraper]
         """
-        try:
-            self.Chrome_activate()
-            self.update()
-        except Exception as e:
-            print(f"Error info:{e}")
-
+        for i in range(5):
+            try:
+                self.Chrome_activate()
+                self.update()
+                time.sleep(1000)
+            except Exception as e:
+                self.browser.close()
+                with open("./error_info.txt", "a") as f:
+                    f.write(f"Error info:{e}"+"\n")
+                continue
 if __name__ == "__main__":
     tweeter = UserInfoCraweler()
     tweeter.launcher()

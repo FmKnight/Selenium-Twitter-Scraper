@@ -18,3 +18,21 @@ Error info:Message: no such window: window was already closed
 Error info:Message: no such window: window was already closed
   (Session info: chrome=89.0.4389.128)
 
+Error info:'generator' object is not callable
+Error info:'generator' object is not callable
+Error info:'NoneType' object has no attribute 'get'
+Error info:'NoneType' object has no attribute 'get'
+Error info:'NoneType' object has no attribute 'get'
+Error info:Message: no such window: window was already closed
+  (Session info: chrome=89.0.4389.128)
+
+Error info:'NoneType' object has no attribute 'get'
+Error info:'NoneType' object has no attribute 'get'
+Error info:Message: no such window: window was already closed
+  (Session info: chrome=89.0.4389.128)
+
+Error info:Message: no such window: window was already closed
+  (Session info: chrome=89.0.4389.128)
+
+Error info:'NoneType' object has no attribute 'get'
+Error info:'NoneType' object has no attribute 'get_text'
