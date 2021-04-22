@@ -6,10 +6,13 @@ import time
 from bs4 import BeautifulSoup as bs
 import re
 
-from utils.RedisDB import RedisDAL
-from utils.MysqlDB import Tweet, MysqlDAL
+from db_settings.RedisDB import RedisDAL
+from db_settings.MysqlDB import Tweet, MysqlDAL
 from utils.content_filter import filter_emoji, count
 from utils.date_generator import time_span_generator
+from utils.hash_digest import msg_digest
+from  utils.logger_generator import logger
+
 
 class TwitterScraper:
     """[main program of Twitter Scraper]
@@ -32,6 +35,8 @@ class TwitterScraper:
         self.browser = webdriver.Chrome(options=options)
 
     def get_url_list(self,*args):
+        """[add url to url_list]
+        """
         self.url_list.extend(args)
 
     def scroll(self):
@@ -67,23 +72,24 @@ class TwitterScraper:
             # check whether there is content or not
             if raw_content:
                 raw_content = raw_content.text
-                content = raw_content.rstrip()          # remove newline character
-                content = filter_emoji(content)         # filter emoji
-                user_id = passage.find(
-                    'div', {'class': 'css-1dbjc4n r-18u37iz r-1wbh5a2 r-13hce6t'}).get_text()
-                date = passage.find('time')['datetime']
-                # change raw time format("2021-04-12 20:30:31") to exact format("2021-04-12 20:30:31")
-                date = date.replace('T',' ').replace('X','').replace('.000Z','')
+                sha256_digest = msg_digest(raw_content)
                 # check whether tweet is duplicate
-                if self.RedisDAL.IsDuplicate(f"{user_id},{date}"):
+                if self.RedisDAL.IsDuplicate(sha256_digest):
                     print("this tweet has benn scraped,skip to next one")
                     continue
                 else:
-                    self.RedisDAL.addUser(f"{user_id},{date}")
+                    self.RedisDAL.addDigest(sha256_digest)
+                    content = raw_content.rstrip()          # remove newline character
+                    content = filter_emoji(content)         # filter emoji
+                    user_id = passage.find(
+                        'div', {'class': 'css-1dbjc4n r-18u37iz r-1wbh5a2 r-13hce6t'}).get_text()
+                    #date = passage.find('time')['datetime']
+                    # change raw time format("2021-04-12 20:30:31") to exact format("2021-04-12 20:30:31")
+                    #date = date.replace('T',' ').replace('X','').replace('.000Z','')
                     user_name = passage.find(
                         'div', {'class': 'css-1dbjc4n r-1awozwy r-18u37iz r-dnmrzs'}).get_text()
                     user_name = filter_emoji(user_name)
-                    #heat data contains reply,retweet and like
+                    #get heat data(reply, retweet, like) after clean
                     heat_data = passage.find_all(
                     'span', {'class': 'css-901oao css-16my406 r-poiln3 r-n6v787 r-1cwl3u0 r-1k6nrdp r-1e081e0 r-d3hbe1 r-axxi2z r-qvutc0'})
                     reply = count(heat_data[0].text)
@@ -92,7 +98,7 @@ class TwitterScraper:
                     self.save_data(user_name, user_id, date, content, reply, retweet, like)
                     print("save data to MysqlDB successfully")
             else:
-                print("fail to get tweets")
+                print("fail to get tweet from page")
                 continue
 
 
@@ -116,21 +122,22 @@ class TwitterScraper:
         """
         while True:
             try:
+                # traverse base urls
                 for base_url in self.url_list:
+                    # get tweet from specific time span
                     for time_span in time_span_generator:
                         start_date, end_date = time_span
-                        url = base_url.format(end_date, start_date)
-                        if url not in self.scraped_url_list:
+                        url = base_url.format(end_date, start_date)     # make specific urls
+                        if url not in self.scraped_url_list:            # judge whether this url is scraped or not
+                            self.scraped_url_list.append(url)
                             self.browser.get(url)
                             self.scroll()
-                            self.scraped_url_list.append(url)
                             time.sleep(5)
                         else:
                             continue
             except Exception as e:
                 #if there are exceptions, restart program
-                with open("./error_info.txt", "a") as f:
-                    f.write(f"Error info:{e}"+"\n")
+                logger.exception(e)
                 self.Chrome_activate()
                 continue
 

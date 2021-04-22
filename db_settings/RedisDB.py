@@ -1,5 +1,5 @@
 from redis import Redis
-from .db_config import Redis_config
+from .dbconfig import Redis_config
 
 class UserInfo:
     """[use redis to check whether tweet is scraped or not]
@@ -16,21 +16,21 @@ class UserInfo:
                         db=Redis_config["schema"], decode_responses=True)
         self.Table = 'twitter'
 
-    def addUser(self, userinfo):
-        """[add user_info(userid,tweet time) to 'twitter']
+    def addDigest(self, tweet_digest):
+        """[add tweet digest to 'twitter']
         Args:
-            userinfo ([str]): [contain userid and tweet time]
+            tweet_digest ([str]): [sha256 digest of tweet]
         """
-        self.db.sadd(self.Table, userinfo)
+        self.db.sadd(self.Table, tweet_digest)
 
-    def IsDuplicate(self,userinfo):
+    def IsDuplicate(self, tweet_digest):
         """[check whether tweet has scraped or not]
         Args:
-            userinfo ([str]): [contain userid and tweet time]
+            tweet_digest ([str]): [sha256 digest of tweet]
         Returns:
-            [Bool]: [return bool value]
+            [Bool]: [return True if tweet digest in Redis set else False]
         """
-        return self.db.sismember(self.Table,userinfo)
+        return self.db.sismember(self.Table, tweet_digest)
 
 
 RedisDAL = UserInfo()

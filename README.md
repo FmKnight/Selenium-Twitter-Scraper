@@ -48,10 +48,17 @@ pip3 install -r requirements.txt
 ![](https://krahets-1304820335.cos.ap-shanghai.myqcloud.com/Github_Repo/Selenium-Twitter-Scraper/result.png)
 
 # Change Log
+### v0.6.3(2021/04/22 15:50)
 
+- change tweet duplicate detection way from user_id+time to sha256 digest of tweet content
+- add logs to monitor running process
+
+### v0.6.2(2021/04/21 21:50)
+
+- change crawl way from one-time to time-span-based
+- refactor the running process,add more condition judge
 ### v0.6.1(2021/04/20 21:50)
 
 - Crawel tweets of specific keywords
 - Crawel  specific user's info
 
-  

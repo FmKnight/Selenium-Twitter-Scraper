@@ -1,7 +1,4 @@
 
-from io import SEEK_END
-
-
 def time_span_generator():
     """[generate dates from 2008-01-01 to 2021-04-22]
     """
@@ -15,9 +12,11 @@ def time_span_generator():
     for i in range(len(dates)-1):
         yield (dates[i], dates[i+1])
 
+
 time_span_generator = time_span_generator()
 
 
 if __name__ == "__main__":
     for i in time_span_generator:
         print(i)
+    

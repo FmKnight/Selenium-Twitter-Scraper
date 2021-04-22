@@ -5,8 +5,9 @@ import time
 from selenium import webdriver
 from bs4 import BeautifulSoup as bs
 
-from utils.MysqlDB import MysqlDAL
+from db_settings.MysqlDB import MysqlDAL
 from utils.content_filter import count
+from  utils.logger_generator import logger
 
 class UserInfoCraweler:
 
@@ -72,9 +73,8 @@ class UserInfoCraweler:
                 self.update()
                 time.sleep(1000)
             except Exception as e:
+                logger.exception(e)
                 self.browser.close()
-                with open("./error_info.txt", "a") as f:
-                    f.write(f"Error info:{e}"+"\n")
                 continue
 if __name__ == "__main__":
     tweeter = UserInfoCraweler()

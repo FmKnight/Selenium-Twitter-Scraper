@@ -5,7 +5,7 @@ from sqlalchemy import Column, Integer, String, Text
 from sqlalchemy.sql.functions import modifier
 from sqlalchemy.sql.sqltypes import Boolean
 
-from .db_config import Mysql_config
+from .dbconfig import Mysql_config
 
 
 Base = declarative_base()

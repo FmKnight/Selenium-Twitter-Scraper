@@ -138,11 +138,12 @@ dmypy.json
 cython_debug/
 
 # configure
-utils/db_config.py
+db_settings/db_config.py
 
 # vscode
 .vscode
 
 .DS_Store
+
 
 
